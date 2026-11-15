@@ -1281,7 +1281,7 @@ function contractOf(p){
 }
 function pjRow(x){
   const p=x.p,g=p.s[0],sel=PJ.sel===p.n;
-  return `<tr class="click${sel?" me":""}" data-act="pj" data-n="${esc(p.n)}"><td>${esc(p.n)}</td><td>${x.t>=0?tb(x.t):'<span class="muted">AL</span>'}</td><td>${p.p}</td><td class="r">${p.a}</td><td class="r ovr">${p.o}</td><td class="r">${p.t}</td><td class="r">${g?(p.s[1]/g).toFixed(1):"–"}</td><td class="r">${p.y>0?money(p.c):'<span class="warn">Libre</span>'}</td><td class="r">${p.y>0?p.y:"–"}</td></tr>`;
+  return `<tr class="click${sel?" me":""}" data-act="pj" data-n="${esc(p.n)}"><td>${esc(p.n)}</td><td>${x.t>=0?tb(x.t):'<span class="muted">AL</span>'}</td><td>${p.p}</td><td class="r">${p.a}</td><td class="r ovr">${DO(p)}</td><td class="r">${DT(p)}</td><td class="r">${g?(p.s[1]/g).toFixed(1):"–"}</td><td class="r">${p.y>0?money(p.c):'<span class="warn">Libre</span>'}</td><td class="r">${p.y>0?p.y:"–"}</td></tr>`;
 }
 function pjList(){
   const L=pjMatches(),shown=L.slice(0,60);
@@ -1300,7 +1300,7 @@ function pjFiche(){
   const r=ENG.ratingsOf(p);
   const eq=x.t>=0?`${tb(x.t)} ${esc(TEAMS[x.t][0])}`:"Agent libre";
   return `<div class="card" id="pjfiche"><div class="btns" style="align-items:center;gap:14px"><h2>${esc(p.n)}</h2><span class="muted">${eq} · ${p.p}${RDp?" ("+RDp[38]+" selon 2K · "+RDp[39]+" · "+RDp[40]+")":R?" ("+R[12]+" selon 2K)":""} · ${p.a} ans</span>${p.i?`<span class="warn">Blessé · ${p.i} j</span>`:""}<button class="btn sm" style="margin-left:auto" data-act="pjclose">Fermer</button></div>
-    <div class="btns" style="gap:26px"><div><div class="muted">OVR</div><b class="ovr" style="font-size:32px">${p.o}</b></div><div><div class="muted">Potentiel</div><b class="ovr" style="font-size:32px">${p.t}</b></div>${RDp||R?`<div><div class="muted">OVR 2K</div><b class="ovr" style="font-size:32px">${RDp?RDp[36]:R[9]}</b></div>`:""}${RDp||R?`<div><div class="muted">Pot. 2K</div><b class="ovr" style="font-size:32px">${RDp?RDp[37]:(R[10]||"–")}</b></div>`:""}<div><div class="muted">Fatigue</div><b class="ovr" style="font-size:32px;color:${fatCol(p)}">${fatPct(p)} %</b></div><div><div class="muted">Salaire</div><b class="ovr" style="font-size:32px">${p.y>0?money(p.c):"–"}</b></div></div>
+    <div class="btns" style="gap:26px"><div><div class="muted">OVR</div><b class="ovr" style="font-size:32px">${DO(p)}</b></div><div><div class="muted">Potentiel</div><b class="ovr" style="font-size:32px">${DT(p)}</b></div>${RDp||R?`<div><div class="muted">OVR 2K</div><b class="ovr" style="font-size:32px">${RDp?RDp[36]:R[9]}</b></div>`:""}${RDp||R?`<div><div class="muted">Pot. 2K</div><b class="ovr" style="font-size:32px">${RDp?RDp[37]:(R[10]||"–")}</b></div>`:""}<div><div class="muted">Fatigue</div><b class="ovr" style="font-size:32px;color:${fatCol(p)}">${fatPct(p)} %</b></div><div><div class="muted">Salaire</div><b class="ovr" style="font-size:32px">${p.y>0?money(p.c):"–"}</b></div></div>
     <div class="grid"><div class="card"><h3>Attributs${R||RDp?" (NBA 2K27)":""}</h3><div class="list">${attrs}</div></div>
     <div class="card"><h3>Compétences du moteur</h3><div class="list">${["three","mid","close","dunk","ft","pass","handle","iq","perD","intD","steal","block","oreb","dreb","speed","str","stam"].map(k=>{const v=(r.raw||r)[k];return `<div class="row"><span class="grow">${SKN[k]}</span><b class="num">${v}</b>${bar(v)}</div>`}).join("")}<div class="row"><span class="grow">Récupération entre les matchs</span><b class="num">${r.rec}</b>${bar(r.rec)}</div></div><p class="note">Chaque compétence est calculée directement à partir des attributs 2K (par exemple la vitesse = 60 % vitesse + 40 % agilité). L'endurance règle l'énergie pendant un match ; la récupération (durabilité et âge) règle la fatigue entre les matchs.</p></div></div>
     <h3>Statistiques</h3><div class="tw"><table><thead><tr><th></th><th class="r">PJ</th><th class="r">MIN</th><th class="r">PTS</th><th class="r">REB</th><th class="r">PD</th><th class="r">TC%</th><th class="r">3P%</th><th class="r">LF%</th><th class="r">INT</th><th class="r">CTR</th><th class="r">BP</th><th class="r">FAU</th></tr></thead><tbody>${sr}${sp}</tbody></table></div>
@@ -1434,7 +1434,7 @@ function renew(i){
 function expCard(){
   const t=S.teams[S.me],ex=t.pl.map((p,i)=>({p,i})).filter(x=>x.p.y<=0);
   if(!ex.length)return "";
-  const rows=ex.map(({p,i})=>{const c=renewAsk(p),y=yearsFor(p);return `<div class="row"><span class="grow">${esc(p.n)} <span class="muted">${p.p} · ${p.a} ans</span></span><b class="ovr">${p.o}</b><span class="muted num">${c.toFixed(1)} M · ${y} an${y>1?"s":""}</span><button class="btn sm" data-act="renew" data-i="${i}">Prolonger</button></div>`}).join("");
+  const rows=ex.map(({p,i})=>{const c=renewAsk(p),y=yearsFor(p);return `<div class="row"><span class="grow">${esc(p.n)} <span class="muted">${p.p} · ${p.a} ans</span></span><b class="ovr">${DO(p)}</b><span class="muted num">${c.toFixed(1)} M · ${y} an${y>1?"s":""}</span><button class="btn sm" data-act="renew" data-i="${i}">Prolonger</button></div>`}).join("");
   return `<div class="card"><h3>Contrats qui expirent (${ex.length})</h3><p class="note">Si tu ne prolonges pas, le joueur part en agent libre au début de la saison. Les prolongations ne comptent pas dans le plafond.</p><div class="list">${rows}</div></div>`;
 }
 
@@ -1638,13 +1638,13 @@ function startNewSeasonLabel(){return (2027+S.season)+"-"+String(28+S.season).sl
 function mvpRow(){return S.mvp?`<div class="row"><span>MVP de la saison :</span><b>${esc(S.mvp[0])}</b> ${tb(S.mvp[1])}</div>`:""}
 function cutCard(){
   const t=S.teams[S.me],eff=cnt(t),over=eff-15;
-  const rows=t.pl.map((p,i)=>({p,i})).sort((a,b)=>b.p.o-a.p.o).map(({p,i})=>`<div class="row"><span class="grow">${esc(p.n)} <span class="muted">${p.p} · ${p.a} ans · ${p.o}/${p.t}${p.y>0?` · ${(p.c||0).toFixed(1)} M`:""}</span>${p.rk?` <span class="warn">rookie</span>`:""}${p.y<=0?` <span class="warn">expire</span>`:""}</span><button class="btn sm danger" data-act="cut" data-i="${i}"${t.pl.length<=12?" disabled":""}>Couper</button></div>`).join("");
+  const rows=t.pl.map((p,i)=>({p,i})).sort((a,b)=>b.p.o-a.p.o).map(({p,i})=>`<div class="row"><span class="grow">${esc(p.n)} <span class="muted">${p.p} · ${p.a} ans · ${DO(p)}/${DT(p)}${p.y>0?` · ${(p.c||0).toFixed(1)} M`:""}</span>${p.rk?` <span class="warn">rookie</span>`:""}${p.y<=0?` <span class="warn">expire</span>`:""}</span><button class="btn sm danger" data-act="cut" data-i="${i}"${t.pl.length<=12?" disabled":""}>Couper</button></div>`).join("");
   return `<div class="card"><h3>Coupes dans l'effectif · ${eff}/15</h3>${over>0?`<p class="warn"><b>Tu as ${over} joueur${over>1?"s":""} en trop.</b> Coupe avant de commencer la saison.</p>`:`<p class="muted">Tu peux couper des joueurs (minimum 12). Les joueurs coupés passent agents libres et ne sont plus payés.</p>`}<div class="list">${rows}</div></div>`;
 }
 function faCard(){
   if(!S.fa.length)return "";
   const t=S.teams[S.me],pay=payroll(t),full=cnt(t)>=15;
-  const rows=S.fa.map((p,i)=>({p,i})).sort((a,b)=>pval(b.p)-pval(a.p)).slice(0,14).map(({p,i})=>{const ask=faAsk(p),ok=pay+ask<=CAP||ask<=2;return `<div class="row"><span class="grow">${esc(p.n)} <span class="muted">${p.p} · ${p.a} ans</span></span><b class="ovr">${p.o}</b><span class="muted num">/${p.t}</span><span class="num" style="min-width:92px;text-align:right">${ask.toFixed(1)} M · ${yearsFor(p)}a</span><button class="btn sm" data-act="sign" data-i="${i}"${full||!ok?" disabled":""}>Signer</button></div>`}).join("");
+  const rows=S.fa.map((p,i)=>({p,i})).sort((a,b)=>pval(b.p)-pval(a.p)).slice(0,14).map(({p,i})=>{const ask=faAsk(p),ok=pay+ask<=CAP||ask<=2;return `<div class="row"><span class="grow">${esc(p.n)} <span class="muted">${p.p} · ${p.a} ans</span></span><b class="ovr">${DO(p)}</b><span class="muted num">/${DT(p)}</span><span class="num" style="min-width:92px;text-align:right">${ask.toFixed(1)} M · ${yearsFor(p)}a</span><button class="btn sm" data-act="sign" data-i="${i}"${full||!ok?" disabled":""}>Signer</button></div>`}).join("");
   return `<div class="card"><h3>Agents libres (${S.fa.length})</h3><p class="note">Masse salariale ${pay.toFixed(1)} M, plafond ${CAP} M, marge ${Math.max(0,CAP-pay).toFixed(1)} M. Au-dessus du plafond, tu ne peux signer que des contrats jusqu'à 2 M.</p>${full?`<p class="note">Effectif complet (15). Coupe quelqu'un pour signer.</p>`:""}<div class="list">${rows}</div></div>`;
 }
 function recapCard(){
@@ -1674,7 +1674,7 @@ function vDraft(){
   let pr="";
   if(!done){
     const rows=[];
-    d.pool.forEach((p,i)=>{if(!taken.has(i)&&rows.length<40)rows.push(`<tr><td>${esc(p.n)}</td><td>${p.p}</td><td class="r">${p.a}</td><td class="r ovr">${p.o}</td><td class="r">${p.t}</td><td class="r">${mine?`<button class="btn sm pri" data-act="draftpick" data-i="${i}">Choisir</button>`:""}</td></tr>`)});
+    d.pool.forEach((p,i)=>{if(!taken.has(i)&&rows.length<40)rows.push(`<tr><td>${esc(p.n)}</td><td>${p.p}</td><td class="r">${p.a}</td><td class="r ovr">${DO(p)}</td><td class="r">${DT(p)}</td><td class="r">${mine?`<button class="btn sm pri" data-act="draftpick" data-i="${i}">Choisir</button>`:""}</td></tr>`)});
     pr=`<div class="card"><h3>Prétendants disponibles</h3><div class="tw"><table><thead><tr><th>Joueur</th><th>Pos</th><th class="r">Âge</th><th class="r">OVR</th><th class="r">POT</th><th></th></tr></thead><tbody>${rows.join("")}</tbody></table></div></div>`;
   }
   const lg=d.picks.slice(-10).reverse().map(x=>`<div class="row"><span class="muted num" style="min-width:34px">#${x.k+1}</span>${tb(x.t)}<span class="grow">${esc(x.n)} <span class="muted">${x.p} · ${x.o}/${x.pt}</span>${x.og!==undefined&&x.og!==x.t?` <span class="note">(choix de ${TEAMS[x.og][1]})</span>`:""}</span></div>`).join("")||`<p class="muted">Personne n'a encore été choisi.</p>`;
@@ -1689,7 +1689,7 @@ function vDraft(){
 function contestCard(k,title,desc){
   const R=S.as[k],key=k==="t"?"et":"ed";
   const mine=S.teams[S.me].pl.filter(p=>!p.i&&elig(p,k)).sort((a,b)=>b.o-a.o);
-  const sel=R?(asEnt(k)?`<p class="muted">Ton inscrit : <b>${esc(asEnt(k))}</b></p>`:`<p class="muted">Tu n'as inscrit personne.</p>`):`<div class="btns" style="align-items:center"><label class="muted" for="selAs${k}">Inscrire</label><select id="selAs${k}" data-asel="${k}"><option value="">Personne</option>${mine.map(p=>`<option value="${esc(p.n)}"${asEnt(k)===p.n?" selected":""}>${esc(p.n)} (${p.o})</option>`).join("")}</select></div>`;
+  const sel=R?(asEnt(k)?`<p class="muted">Ton inscrit : <b>${esc(asEnt(k))}</b></p>`:`<p class="muted">Tu n'as inscrit personne.</p>`):`<div class="btns" style="align-items:center"><label class="muted" for="selAs${k}">Inscrire</label><select id="selAs${k}" data-asel="${k}"><option value="">Personne</option>${mine.map(p=>`<option value="${esc(p.n)}"${asEnt(k)===p.n?" selected":""}>${esc(p.n)} (${DO(p)})</option>`).join("")}</select></div>`;
   const tbl=R?`<div class="tw"><table><thead><tr><th>Joueur</th><th>Équipe</th><th class="r">Tour 1</th><th class="r">Finale</th></tr></thead><tbody>${R.rows.map(r=>`<tr class="${r.t===S.me?"me":""}"><td>${esc(r.n)}${r.w?` <span class="good"><b>Vainqueur</b></span>`:""}</td><td>${tb(r.t)}</td><td class="r">${r.r1}</td><td class="r">${r.f===null?"–":r.f}</td></tr>`).join("")}</tbody></table></div>`:`<div class="btns"><button class="btn pri" data-act="as" data-k="${k}">Lancer le concours</button></div>`;
   return `<div class="card"><h3>${title}</h3><p class="muted">${desc}</p>${sel}${tbl}</div>`;
 }
@@ -1700,7 +1700,7 @@ function vAllstar(){
     const lst=(L,name,pts)=>`<div class="card"><h3>${name} · ${pts}</h3><div class="tw"><table><tbody>${L.map(x=>`<tr class="${x.t===S.me?"me":""}"><td>${esc(x.n)}</td><td>${tb(x.t)}</td><td class="r"><b>${x.pt}</b></td></tr>`).join("")}</tbody></table></div></div>`;
     asg=`<div class="card full"><h3>All-Star Game</h3><div class="next"><div class="vs">Est ${g.e} – ${g.w} Ouest</div><div class="muted">MVP : <b>${esc(g.mvp[0])}</b> ${tb(g.mvp[1])} (${g.mvp[2]} pts)</div></div></div>${lst(g.E,"Est",g.e)}${lst(g.W,"Ouest",g.w)}`;
   }else{
-    const pv=c=>asPick(c).map((x,k)=>`<div class="row"><span class="grow">${esc(x.p.n)}${k<5?"":` <span class="muted">remplaçant</span>`}</span>${tb(x.t)}<b class="ovr">${x.p.o}</b></div>`).join("");
+    const pv=c=>asPick(c).map((x,k)=>`<div class="row"><span class="grow">${esc(x.p.n)}${k<5?"":` <span class="muted">remplaçant</span>`}</span>${tb(x.t)}<b class="ovr">${DO(x.p)}</b></div>`).join("");
     asg=`<div class="card full"><h3>All-Star Game</h3><p class="muted">Les 12 meilleurs de chaque conférence selon leur note et leurs points. Les 5 premiers sont titulaires.</p><div class="btns"><button class="btn pri" data-act="as" data-k="g">Jouer le match</button></div></div><div class="card"><h3>Est</h3><div class="list">${pv(0)}</div></div><div class="card"><h3>Ouest</h3><div class="list">${pv(1)}</div></div>`;
   }
   return `<div class="grid"><div class="card full"><h2>Week-end des étoiles</h2><p class="muted">Les résultats n'affectent ni le calendrier ni les blessures.</p></div>
@@ -2241,7 +2241,7 @@ function rosterTable(ti){
   const t=S.teams[ti],mm=new Map(lineup(t,false).map(x=>[x.p,x.m]));
   const rows=t.pl.slice().sort((a,b)=>b.o-a.o).map(p=>{
     const m=mm.get(p)||0,role=p.i?`<span class="warn">Blessé · ${p.i} j</span>`:(m>=27?"Titulaire":m>=13?"Rotation":m>0?"Banc":"Ne joue pas"),g=p.s[0];
-    return `<tr><td>${esc(p.n)}</td><td>${p.p}</td><td class="r">${p.a}</td><td class="r ovr">${p.o}</td><td class="r">${p.t}</td>
+    return `<tr><td>${esc(p.n)}</td><td>${p.p}</td><td class="r">${p.a}</td><td class="r ovr">${DO(p)}</td><td class="r">${DT(p)}</td>
       <td class="r">${g}</td><td class="r">${g?(p.s[1]/g).toFixed(1):"–"}</td><td class="r">${g?(p.s[2]/g).toFixed(1):"–"}</td><td class="r">${g?(p.s[3]/g).toFixed(1):"–"}</td><td class="r">${p.i?"–":m}</td><td class="r">${p.c!=null?p.c.toFixed(1):"–"}</td><td class="r">${p.y>0?p.y:`<span class="warn">Expire</span>`}</td><td>${role}</td><td>${fatCell(p)}</td></tr>`;
   }).join("");
   return `<div class="tw"><table><thead><tr><th>Joueur</th><th>Pos</th><th class="r">Âge</th><th class="r">OVR</th><th class="r">POT</th><th class="r">MJ</th><th class="r">PTS</th><th class="r">REB</th><th class="r">PD</th><th class="r">MIN</th><th class="r">Sal. (M)</th><th class="r">Ans</th><th>Rôle</th><th>Fatigue</th></tr></thead><tbody>${rows}</tbody></table></div>`;
@@ -2288,7 +2288,7 @@ function vInicio(){
       <p class="note">Il reste ${SCH.days.length-S.day} journées et ${MY.filter(g=>g.d>=S.day).length} matchs pour ton équipe. ${tradeOpen()?`Date limite des échanges : ${fmtDate(TDL())}`:""}</p></div>`;
   }
   const rec=S.log.filter(g=>g[7]===undefined||g[7]===S.me).slice(-5).reverse().map(resultRow).join("")||`<p class="muted">Tu n'as encore joué aucun match.</p>`;
-  const inj=m.pl.filter(p=>p.i).sort((a,b)=>b.o-a.o).map(p=>`<div class="row"><span class="grow">${esc(p.n)} <span class="muted">${p.p} · ${p.o}</span></span><span class="warn num">${p.i} jours</span></div>`).join("")||`<p class="muted">Tout l'effectif est en bonne santé.</p>`;
+  const inj=m.pl.filter(p=>p.i).sort((a,b)=>b.o-a.o).map(p=>`<div class="row"><span class="grow">${esc(p.n)} <span class="muted">${p.p} · ${DO(p)}</span></span><span class="warn num">${p.i} jours</span></div>`).join("")||`<p class="muted">Tout l'effectif est en bonne santé.</p>`;
   const news=S.news.filter(n=>n[3]===undefined||n[3]===S.me).slice(0,6).map(n=>`<div class="note">${fmtDate(n[0])}: ${esc(n[1])} se blesse (${n[2]} jours).</div>`).join("");
   const last=S.last.length?S.last.map(([h,a,ph,pa])=>`<div class="row"><span class="grow">${tb(h)} ${tb(a)}</span><b class="num" style="${h===S.me||a===S.me?"color:var(--accent)":""}">${ph}–${pa}</b></div>`).join(""):`<p class="muted">Les résultats de la dernière journée simulée s'afficheront ici.</p>`;
   return `<div class="grid">${next}
@@ -2302,13 +2302,15 @@ function vPlantilla(){
   return `<div class="card"><div class="btns" style="align-items:baseline;gap:22px"><h2>Effectif</h2><span class="muted">Force ${teamStr(m).toFixed(1)} (n°${strengthRank(S.me)} sur 30) · âge moyen ${avg} · ${m.pl.length} joueurs · masse salariale ${payroll(m).toFixed(1)} M sur ${CAP} M</span></div>${rosterTable(S.me)}
     <p class="note">Les minutes sont réparties automatiquement selon la note entre les joueurs en bonne santé, sauf si tu les modifies dans l'onglet Rotation.</p></div>${S.dr?expCard():""}${offseason()?cutCard():""}${faCard()}`;
 }
+function DO(p){const R=typeof RD!=="undefined"&&RD[p.n];return R?R[36]+Math.round((p.o-(p.q0!=null?p.q0:p.o))*.9):p.o}
+function DT(p){return DO(p)+Math.max(0,p.t-p.o)}
 function vTactica(){return tacCard()+stratCard()+scoutCard()}
 function vRotacion(){
   const t=S.teams[S.me],info=minsInfo(),mm=new Map(info.L.map(x=>[x.p,x.m]));
   const rows=t.pl.map((p,i)=>({p,i})).sort((a,b)=>b.p.o-a.p.o).map(({p,i})=>{
     const m=S.teams[S.me].man?(p.m||0):(mm.get(p)||0);
     const flag=p.i?`<span class="warn">Blessé · ${p.i} j</span>`:(m>36?`<span class="warn">Surcharge</span>`:"");
-    return `<tr><td>${esc(p.n)}</td><td>${p.p}</td><td class="r ovr">${p.o}</td><td style="min-width:170px"><input type="range" min="0" max="42" step="1" value="${m}" data-pi="${i}" class="mrange" aria-label="Minutes de ${esc(p.n)}"></td><td class="r"><b id="mv-${i}">${m}</b></td><td>${fatCell(p)}</td><td>${flag}</td></tr>`;
+    return `<tr><td>${esc(p.n)}</td><td>${p.p}</td><td class="r ovr">${DO(p)}</td><td style="min-width:170px"><input type="range" min="0" max="42" step="1" value="${m}" data-pi="${i}" class="mrange" aria-label="Minutes de ${esc(p.n)}"></td><td class="r"><b id="mv-${i}">${m}</b></td><td>${fatCell(p)}</td><td>${flag}</td></tr>`;
   }).join("");
   return `<div class="card"><div class="btns" style="align-items:baseline;gap:22px"><h2>Rotation</h2><span class="muted">${S.teams[S.me].man?"Minutes manuelles":"Minutes automatiques"}</span></div>
     <p class="muted" style="max-width:70ch">Répartis les minutes de chaque joueur. Chaque joueur accumule de la fatigue selon ses minutes jouées et la récupère les jours de repos, à un rythme qui dépend de sa récupération (durabilité et âge). L'endurance, elle, règle uniquement l'énergie pendant un match (dos à dos et séries de matchs serrées coûtent cher). Un joueur fatigué perd légèrement en attributs, ses minutes sont réduites s'il est remplacé automatiquement, et il se blesse plus facilement, surtout s'il a une faible durabilité. Au-delà de 36 minutes, la note d'équipe estimée baisse. Si le total ne fait pas 240 (5 joueurs × 48), les minutes sont réparties proportionnellement.</p>
@@ -2323,7 +2325,7 @@ function vTraspasos(){
   const opts=TEAMS.map((x,k)=>k===S.me?"":`<option value="${k}"${k===tt?" selected":""}>${esc(x[0])}</option>`).join("");
   const dis=open?"":" disabled";
   const list=(team,set,kind)=>team.pl.map((p,i)=>({p,i})).filter(x=>x.p.y>0).sort((a,b)=>b.p.o-a.p.o).map(({p,i})=>
-    `<label class="chk ${set.has(i)?"on":""}"><input type="checkbox" data-chk="${kind}" data-i="${i}"${set.has(i)?" checked":""}${dis}><span class="grow pn"><b>${esc(p.n)}</b><span class="muted">${p.p} · ${p.a} ans</span></span><span class="tc tc-o"><b class="ovr">${p.o}</b></span><span class="tc tc-p muted">${p.t}</span><span class="tc tc-s"><b>${(p.c||0).toFixed(1)} M</b><i class="muted">${p.y} an${p.y>1?"s":""}</i></span></label>`).join("");
+    `<label class="chk ${set.has(i)?"on":""}"><input type="checkbox" data-chk="${kind}" data-i="${i}"${set.has(i)?" checked":""}${dis}><span class="grow pn"><b>${esc(p.n)}</b><span class="muted">${p.p} · ${p.a} ans</span></span><span class="tc tc-o"><b class="ovr">${DO(p)}</b></span><span class="tc tc-p muted">${DT(p)}</span><span class="tc tc-s"><b>${(p.c||0).toFixed(1)} M</b><i class="muted">${p.y} an${p.y>1?"s":""}</i></span></label>`).join("");
   const plist=(h,set,kind)=>S.pk.map((k,i)=>({k,i})).filter(x=>x.k[3]===h&&(x.k[0]>S.season||(x.k[0]===S.season&&!S.dr))).sort((a,b)=>a.k[0]-b.k[0]||a.k[1]-b.k[1]).map(({k,i})=>
     `<label class="chk ${set.has(i)?"on":""}"><input type="checkbox" data-chk="${kind}" data-i="${i}"${set.has(i)?" checked":""}${dis}><span class="grow">${pickLabel(k)}</span></label>`).join("");
   const nGive=ev.give.length+ev.gpk.length,nGet=ev.get.length+ev.rpk.length;
@@ -2408,7 +2410,7 @@ function vPicker(){
   };
   const conf=c=>`<div class="card"><h2>${CONFS[c]}</h2><div class="picker">${Array.from({length:15},(_,k)=>card(c*15+k)).join("")}</div></div>`;
   return modeBar()+`<div class="hero"><h1>Hardwood GM</h1><p class="muted">Dirige une franchise NBA avec les effectifs de la saison 2026-27. Choisis ton équipe ; chaque personne qui ouvre cette page joue sa propre partie, sauvegardée sur son compte.</p></div>${conf(0)}${conf(1)}
-    <p class="note">Les attributs des joueurs proviennent de NBA 2K27 (2KRatings) et les contrats de HoopsHype / Basketball-Reference ; la note globale (OVR) du jeu est une estimation propre.</p>`;
+    <p class="note">Les attributs des joueurs proviennent de NBA 2K27 (2KRatings) et les contrats de HoopsHype / Basketball-Reference ; la note globale (OVR) est celle de 2K27, qui évolue avec la progression des joueurs.</p>`;
 }
 const TABS=[["inicio","Accueil"],["plantilla","Effectif"],["tactica","Tactique"],["rotacion","Rotation"],["traspasos","Échanges"],["calendario","Calendrier"],["clasif","Classement"],["allstar","All-Star"],["playoffs","Playoffs"],["premios","Récompenses"],["draft","Draft"],["lideres","Leaders"],["equipos","Équipes"],["joueurs","Joueurs"]];
 function shell(){
@@ -2576,7 +2578,7 @@ function tradeWhy(ev){
   if(ev.okN&&!ev.sal){
     if(ev.r<1&&ev.ask>0){
       const gap=ev.ask-ev.recv,cand=me.pl.filter(p=>p.y>0&&!ev.give.includes(p)).map(p=>({p,v:mval(tt,p)})).filter(x=>x.v>=gap).sort((a,b)=>a.v-b.v)[0];
-      out.push(cand?`Piste : ajoute ${cand.p.n} (${cand.p.o}, ${cand.p.a} ans) pour que l'échange passe.`:"Il manque beaucoup de valeur : une seule pièce ne suffira pas, essaie d'ajouter plusieurs joueurs ou un meilleur joueur.");
+      out.push(cand?`Piste : ajoute ${cand.p.n} (${DO(cand.p)}, ${cand.p.a} ans) pour que l'échange passe.`:"Il manque beaucoup de valeur : une seule pièce ne suffira pas, essaie d'ajouter plusieurs joueurs ou un meilleur joueur.");
     }else if(ev.r>=1.6)out.push("Tu surpaies : ils accepteraient avec nettement moins. Essaie de retirer une pièce.");
     const npl=me.pl.filter(p=>!ev.give.includes(p)).concat(ev.get),b0=teamStr(me),b1=teamStr({...me,pl:npl,man:false});
     const d=b1-b0;out.push(`Effet sur ton équipe : force ${b0.toFixed(1)} → ${b1.toFixed(1)} (${d>=0?"+":""}${d.toFixed(1)}).`);
