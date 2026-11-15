@@ -101,7 +101,7 @@ input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px}
 .chk{display:flex;align-items:center;gap:10px;padding:6px 4px;border-bottom:1px solid var(--line);cursor:pointer;min-width:0}
 .chk:last-child{border-bottom:0}
 .chk.on{background:var(--hl)}
-.chk .grow{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chk .pn{white-space:normal;overflow:visible;line-height:1.25}.chk .pn b,.chk .pn span{display:block}.chk .pn span{font-size:12px}.chk .tc{flex:none;text-align:right}.tc-o{width:42px}.tc-o .ovr{font-size:22px}.tc-p{width:34px}.tc-s{width:76px;display:flex;flex-direction:column;line-height:1.2}.tc-s b{font-size:14px}.tc-s i{font-style:normal;font-size:11px}.chk.hd{cursor:default;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding-bottom:4px}.chk.hd .tc-s{display:block}.chk .grow{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .verdict{border-left:4px solid var(--muted);padding:8px 12px;background:var(--soft);border-radius:0 7px 7px 0}
 .verdict.ok{border-color:var(--good)} .verdict.mid{border-color:var(--warn)} .verdict.no{border-color:var(--bad)}
 .meter{height:8px;border-radius:4px;background:var(--line);overflow:hidden}
@@ -2323,7 +2323,7 @@ function vTraspasos(){
   const opts=TEAMS.map((x,k)=>k===S.me?"":`<option value="${k}"${k===tt?" selected":""}>${esc(x[0])}</option>`).join("");
   const dis=open?"":" disabled";
   const list=(team,set,kind)=>team.pl.map((p,i)=>({p,i})).filter(x=>x.p.y>0).sort((a,b)=>b.p.o-a.p.o).map(({p,i})=>
-    `<label class="chk ${set.has(i)?"on":""}"><input type="checkbox" data-chk="${kind}" data-i="${i}"${set.has(i)?" checked":""}${dis}><span class="grow">${esc(p.n)} <span class="muted">${p.p} · ${p.a} ans · ${(p.c||0).toFixed(1)} M · ${p.y}a</span></span><b class="ovr">${p.o}</b><span class="muted num">/${p.t}</span></label>`).join("");
+    `<label class="chk ${set.has(i)?"on":""}"><input type="checkbox" data-chk="${kind}" data-i="${i}"${set.has(i)?" checked":""}${dis}><span class="grow pn"><b>${esc(p.n)}</b><span class="muted">${p.p} · ${p.a} ans</span></span><span class="tc tc-o"><b class="ovr">${p.o}</b></span><span class="tc tc-p muted">${p.t}</span><span class="tc tc-s"><b>${(p.c||0).toFixed(1)} M</b><i class="muted">${p.y} an${p.y>1?"s":""}</i></span></label>`).join("");
   const plist=(h,set,kind)=>S.pk.map((k,i)=>({k,i})).filter(x=>x.k[3]===h&&(x.k[0]>S.season||(x.k[0]===S.season&&!S.dr))).sort((a,b)=>a.k[0]-b.k[0]||a.k[1]-b.k[1]).map(({k,i})=>
     `<label class="chk ${set.has(i)?"on":""}"><input type="checkbox" data-chk="${kind}" data-i="${i}"${set.has(i)?" checked":""}${dis}><span class="grow">${pickLabel(k)}</span></label>`).join("");
   const nGive=ev.give.length+ev.gpk.length,nGet=ev.get.length+ev.rpk.length;
@@ -2341,8 +2341,8 @@ function vTraspasos(){
       <span class="note" style="margin-left:auto">${open?(offseason()?"Marché d'été ouvert":`Jusqu'au ${fmtDate(TDL())}`):"Marché fermé"}</span></div>
       <p class="muted" style="max-width:72ch">Coche ce que tu donnes et ce que tu demandes, joueurs et choix de draft. Les équipes tiennent compte de l'âge, du potentiel, du contrat et surtout de la note : une star vaut bien plus que deux bons joueurs. Selon son classement, une équipe vise le titre (elle préfère les vétérans) ou reconstruit (elle préfère les jeunes et les choix de draft). Un conseil s'affiche sous l'évaluation.</p>
       ${propCard()}<p class="note">Masse salariale : toi ${payroll(me).toFixed(1)} M · ${esc(TEAMS[tt][1])} ${payroll(ot).toFixed(1)} M · plafond ${CAP} M. Si une équipe dépasse le plafond après l'échange, elle ne peut recevoir que 125 % du salaire qu'elle envoie.</p></div>
-    <div class="card"><h3>Ton effectif (${cnt(me)}) · tu donnes ${nGive}</h3><div>${list(me,gs,"give")}${plist(S.me,gp,"gpk")}</div></div>
-    <div class="card"><h3>${esc(TEAMS[tt][0])} (${cnt(ot)}) · tu demandes ${nGet}</h3><div>${list(ot,rs,"get")}${plist(tt,rp,"rpk")}</div></div>
+    <div class="card"><h3>Ton effectif (${cnt(me)}) · tu donnes ${nGive}</h3><div class="chk hd"><span class="grow">Joueur</span><span class="tc tc-o">Gén.</span><span class="tc tc-p">Pot.</span><span class="tc tc-s">Salaire</span></div><div>${list(me,gs,"give")}${plist(S.me,gp,"gpk")}</div></div>
+    <div class="card"><h3>${esc(TEAMS[tt][0])} (${cnt(ot)}) · tu demandes ${nGet}</h3><div class="chk hd"><span class="grow">Joueur</span><span class="tc tc-o">Gén.</span><span class="tc tc-p">Pot.</span><span class="tc tc-s">Salaire</span></div><div>${list(ot,rs,"get")}${plist(tt,rp,"rpk")}</div></div>
     <div class="card full">${verdict}${advice(ev)}${tmsg?`<p class="good"><b>${esc(tmsg)}</b></p>`:""}<div class="btns"><button class="btn pri" data-act="trade"${open&&ev.okN&&!ev.sal&&(isHum(tt)||ev.r>=1)?"":" disabled"}>${isHum(tt)?"Envoyer la proposition":"Conclure l'échange"}</button><button class="btn" data-act="cleartrade">Effacer la sélection</button></div></div>
     <div class="card full"><h3>Échanges réalisés</h3><div class="list">${hist}</div></div>${ltCard()}</div>`;
 }
