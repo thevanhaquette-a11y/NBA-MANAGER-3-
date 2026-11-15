@@ -1,8 +1,7 @@
 // Hardwood GM – serveur de ligue (Node, zéro dépendance). Sert le jeu + l'API de synchronisation.
 const http=require("http"),fs=require("fs"),path=require("path");
 const PORT=process.env.PORT||3000,DIR=process.env.DATA_DIR||path.join(__dirname,"data");
-const HTML=path.join(__dirname,"public","Hardwood_GM.html");
-fs.mkdirSync(DIR,{recursive:true});
+const HTML=path.join(__dirname,"Hardwood_GM.html");fs.mkdirSync(DIR,{recursive:true});
 const L={},locks={},timers={};
 const okCode=c=>/^[a-z0-9]{1,24}$/.test(c);
 const file=c=>path.join(DIR,c+".json");
